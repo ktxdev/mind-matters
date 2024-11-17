@@ -30,8 +30,10 @@ def handle_group_specific_missing_values(data: pd.DataFrame, column: str, group_
     return data
 
 
-def handle_missing_values(data: pd.DataFrame):
+def handle_missing_values(data: pd.DataFrame) -> pd.DataFrame:
     """Handles missing values in data and saves the cleaned data to disk."""
+    # Create a copy of the data
+    data = data.copy()
 
     # Handle missing values for students in the "Study Satisfaction", "Academic Pressure" and "CGPA" column
     data = handle_group_specific_missing_values(data,
@@ -68,9 +70,43 @@ def handle_missing_values(data: pd.DataFrame):
     data.loc[data['Working Professional or Student'] == 'Working Professional', 'Profession'] = data.loc[
         data['Working Professional or Student'] == 'Working Professional', 'Profession'].fillna('Unknown')
 
+    return data
+
+
+def handle_categorical_outliers(data: pd.DataFrame,
+                                column: str,
+                                threshold: int) -> pd.DataFrame:
+    data = data.copy()
+    # Handle outliers in the "City" column
+    value_counts = data[column].value_counts()
+    # Identify categories below the threshold
+    categories_to_group = value_counts[value_counts < threshold].index
+    # Replace categories below the threshold with 'Other'
+    data[column] = data[column].replace(categories_to_group, 'Unknown')
+    return data
+
+
+def handling_outliers(data: pd.DataFrame) -> pd.DataFrame:
+    """Handles outliers for a specific columns in the dataset."""
+    # Make a copy of the dataframe
+    data = data.copy()
+    # Handle outliers in the "City" column
+    data = handle_categorical_outliers(data, 'City', 10)
+    # Handle outliers in the "Profession" column
+    data = handle_categorical_outliers(data, 'Profession', 10)
+    # Handle outliers in the "Sleep Duration" column
+    data = handle_categorical_outliers(data, 'Sleep Duration', 20)
+    # Handle outliers in the "Dietary Habits" column
+    data = handle_categorical_outliers(data, 'Dietary Habits', 10)
+    # Handle outliers in the "Degree" column
+    data = handle_categorical_outliers(data, 'Degree', 10)
+
+    return data
+
 
 if __name__ == '__main__':
     from data_preprocessing import load_data
 
     data = load_data()
-    handle_missing_values(data)
+    data = handle_missing_values(data)
+    data = handling_outliers(data)
