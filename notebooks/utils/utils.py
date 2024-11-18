@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from typing import Dict
+from typing import Dict, List
 
 
 def check_missing_values(data: DataFrame, column: str):
@@ -9,7 +9,7 @@ def check_missing_values(data: DataFrame, column: str):
     print(f"Missing values count: {missing_values_count}\nMissing values percentage: {missing_values_percentage}%")
 
 
-def handle_group_specific_missing_values(data: DataFrame, column: str, group_column: str, group_value: str):
+def handle_group_specific_missing_values(data: DataFrame, column: str, group_column: str, group_value: str) -> DataFrame:
     data = data.copy()
     # Calculate median for the specific group
     group_median = data.loc[data[group_column] == group_value, column].median()
@@ -27,7 +27,7 @@ def handle_group_specific_missing_values(data: DataFrame, column: str, group_col
     return data
 
 
-def handle_profession_missing_values(data: DataFrame, values: Dict[str, str]):
+def handle_profession_missing_values(data: DataFrame, values: Dict[str, str]) -> DataFrame:
     """Fills missing values in the 'Profession' column based on the value in the
     'Working Professional or Student' column.
 
@@ -50,7 +50,13 @@ def handle_profession_missing_values(data: DataFrame, values: Dict[str, str]):
     return data
 
 
-def handle_financial_stress_missing_values(data: DataFrame):
+def handle_financial_stress_missing_values(data: DataFrame) -> DataFrame:
     data = data.copy()
     data['Financial Stress'] = data['Financial Stress'].fillna(data['Financial Stress'].median())
+    return data
+
+def handle_categorical_missing_values(data: DataFrame, columns: List[str]) -> DataFrame:
+    data = data.copy()
+    for column in columns:
+        data[column] = data[column].fillna(data[column].mode()[0])
     return data
