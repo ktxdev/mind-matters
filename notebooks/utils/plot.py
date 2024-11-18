@@ -140,17 +140,20 @@ def plot_numerical_vs_categorical(data: pd.DataFrame, numeric_col: str, categori
 def plot_categorical_vs_categorical(data: pd.DataFrame,
                                     categorical_col1: str,
                                     categorical_col2: str,
-                                    batch_size: int = 20) -> None:
+                                    batch_size: int = 20,
+                                    batched: bool = True) -> None:
     if len(data[categorical_col2].unique()) > len(data[categorical_col1].unique()):
         plot_categorical_vs_categorical(data, categorical_col2, categorical_col1, batch_size)
         return
 
     unique_categories = data[categorical_col1].unique()
 
-    if len(unique_categories) > batch_size:
+    if batched and len(unique_categories) > batch_size:
         _plot_categorical_vs_categorical_batched(data, unique_categories, categorical_col1, categorical_col2, batch_size)
         return
 
+    plt.figure(figsize=(20, 8))  # Set figure dimensions (width=10, height=6)
     sns.countplot(data=data, x=categorical_col1, hue=categorical_col2)
     plt.title(f'{categorical_col1} vs. {categorical_col2}')
+    plt.xticks(rotation=90)  # Rotate the x-axis ticks by 45 degrees
     plt.show()
