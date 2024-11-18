@@ -113,8 +113,9 @@ def plot_categorical(data: pd.DataFrame, column: str) -> None:
     if len(unique_values) > DEFAULT_BATCH_SIZE:
         _plot_categorical_batched(data, unique_values, column)
     else:
+        fig, (ax) = plt.subplots(1, 1, figsize=(10, 6))
         sns.countplot(data, x=column)
-        plt.figure(figsize=(10, 6))
+        ax.tick_params(axis='x', rotation=90)
         plt.show()
 
 

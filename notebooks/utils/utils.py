@@ -9,20 +9,24 @@ def check_missing_values(data: DataFrame, column: str):
     print(f"Missing values count: {missing_values_count}\nMissing values percentage: {missing_values_percentage}%")
 
 
-def handle_group_specific_missing_values(data: DataFrame, column: str, group_column: str, group_value: str) -> DataFrame:
+def handle_group_specific_missing_values(data: DataFrame, columns: List[str], group_column: str,
+                                         group_value: str) -> DataFrame:
     data = data.copy()
-    # Calculate median for the specific group
-    group_median = data.loc[data[group_column] == group_value, column].median()
 
-    # Fill missing values for the specific group
-    data.loc[data[group_column] == group_value, column] = data.loc[data[group_column] == group_value, column].fillna(
-        group_median)
+    for column in columns:
+        # Calculate median for the specific group
+        group_median = data.loc[data[group_column] == group_value, column].median()
 
-    # Fill remaining missing values with -1 for "Not Applicable"
-    data[column] = data[column].fillna(-1)
+        # Fill missing values for the specific group
+        data.loc[data[group_column] == group_value, column] = data.loc[
+            data[group_column] == group_value, column].fillna(
+            group_median)
 
-    # Add an applicability column
-    data[f'{column} Applicable'] = data[group_column].apply(lambda x: 1 if x == group_value else 0)
+        # Fill remaining missing values with -1 for "Not Applicable"
+        data[column] = data[column].fillna(-1)
+
+        # Add an applicability column
+        data[f'{column} Applicable'] = data[group_column].apply(lambda x: 1 if x == group_value else 0)
 
     return data
 
@@ -55,8 +59,23 @@ def handle_financial_stress_missing_values(data: DataFrame) -> DataFrame:
     data['Financial Stress'] = data['Financial Stress'].fillna(data['Financial Stress'].median())
     return data
 
+
 def handle_categorical_missing_values(data: DataFrame, columns: List[str]) -> DataFrame:
     data = data.copy()
     for column in columns:
         data[column] = data[column].fillna(data[column].mode()[0])
+    return data
+
+def handle_categorical_outliers(data: DataFrame,
+                                columns: List[str],
+                                threshold: int = 10) -> DataFrame:
+    data = data.copy()
+    for column in columns:
+        # Handle outliers in the "City" column
+        value_counts = data[column].value_counts()
+        # Identify categories below the threshold
+        categories_to_group = value_counts[value_counts < threshold].index
+        # Replace categories below the threshold with 'Other'
+        data[column] = data[column].replace(categories_to_group, 'Other')
+
     return data
