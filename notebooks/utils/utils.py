@@ -4,6 +4,8 @@ import pandas as pd
 from pandas import DataFrame
 from typing import Dict, List
 
+from sklearn.preprocessing import StandardScaler
+
 
 def check_missing_values(data: DataFrame, column: str):
     missing_values_rows = data[column].isnull()
@@ -69,6 +71,7 @@ def handle_categorical_missing_values(data: DataFrame, columns: List[str]) -> Da
         data[column] = data[column].fillna(data[column].mode()[0])
     return data
 
+
 def handle_categorical_outliers(data: DataFrame,
                                 columns: List[str],
                                 threshold: int = 10) -> DataFrame:
@@ -81,6 +84,23 @@ def handle_categorical_outliers(data: DataFrame,
         # Replace categories below the threshold with 'Other'
         data[column] = data[column].replace(categories_to_group, 'Other')
 
+    return data
+
+
+def encode_categorical_features(data: DataFrame) -> DataFrame:
+    categorical_features = ['City', 'Working Professional or Student', 'Profession', 'Gender',
+                            'Sleep Duration', 'Dietary Habits', 'Degree', 'Have you ever had suicidal thoughts ?',
+                            'Family History of Mental Illness']
+    return pd.get_dummies(data, columns=categorical_features, drop_first=True)
+
+
+def standardize_numerical_features(data: DataFrame) -> DataFrame:
+    data = data.copy()
+    scaler = StandardScaler()
+    # Standardize numerical features
+    numerical_features = ['Age', 'Academic Pressure', 'Work Pressure', 'CGPA', 'Study Satisfaction', 'Job Satisfaction',
+                          'Work/Study Hours', 'Financial Stress']
+    data[numerical_features] = scaler.fit_transform(data[numerical_features])
     return data
 
 
@@ -97,18 +117,19 @@ def save_data(data: DataFrame, dir_path: str, file_name: str):
 
     print(f"Dataframe saved!")
 
+
 if __name__ == '__main__':
     df = pd.read_csv("https://raw.githubusercontent.com/ktxdev/mind-matters/refs/heads/master/data/raw/test.csv")
 
     df = handle_group_specific_missing_values(df,
-                                            columns=["Academic Pressure","CGPA","Study Satisfaction"],
-                                            group_column="Working Professional or Student",
-                                            group_value="Student")
+                                              columns=["Academic Pressure", "CGPA", "Study Satisfaction"],
+                                              group_column="Working Professional or Student",
+                                              group_value="Student")
 
     df = handle_group_specific_missing_values(df,
-                                            columns=["Work Pressure", "Job Satisfaction"],
-                                            group_column="Working Professional or Student",
-                                            group_value="Working Professional")
+                                              columns=["Work Pressure", "Job Satisfaction"],
+                                              group_column="Working Professional or Student",
+                                              group_value="Working Professional")
 
     fill_values = {
         'Working Professionals': 'Unknown',
