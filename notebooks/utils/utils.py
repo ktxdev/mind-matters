@@ -1,3 +1,5 @@
+import os
+
 from pandas import DataFrame
 from typing import Dict, List
 
@@ -79,3 +81,17 @@ def handle_categorical_outliers(data: DataFrame,
         data[column] = data[column].replace(categories_to_group, 'Other')
 
     return data
+
+
+def save_data(data: DataFrame, dir_path: str, file_name: str):
+    dir_path = os.path.abspath(os.path.join(os.getcwd(), f"../data/{dir_path}"))
+
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+    file_path = os.path.join(dir_path, f"{file_name}.csv")
+
+    # Assuming `df` is your dataframe
+    data.to_csv(file_path, index=False)
+
+    print(f"Dataframe saved!")
