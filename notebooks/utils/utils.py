@@ -1,5 +1,6 @@
 import os
 
+import pandas as pd
 from pandas import DataFrame
 from typing import Dict, List
 
@@ -95,3 +96,30 @@ def save_data(data: DataFrame, dir_path: str, file_name: str):
     data.to_csv(file_path, index=False)
 
     print(f"Dataframe saved!")
+
+if __name__ == '__main__':
+    df = pd.read_csv("https://raw.githubusercontent.com/ktxdev/mind-matters/refs/heads/master/data/raw/test.csv")
+
+    df = handle_group_specific_missing_values(df,
+                                            columns=["Academic Pressure","CGPA","Study Satisfaction"],
+                                            group_column="Working Professional or Student",
+                                            group_value="Student")
+
+    df = handle_group_specific_missing_values(df,
+                                            columns=["Work Pressure", "Job Satisfaction"],
+                                            group_column="Working Professional or Student",
+                                            group_value="Working Professional")
+
+    fill_values = {
+        'Working Professionals': 'Unknown',
+        'Student': 'Student'
+    }
+    df = handle_profession_missing_values(df, fill_values)
+
+    columns_to_impute = ['Degree', 'Dietary Habits']
+    df = handle_categorical_missing_values(df, columns_to_impute)
+
+    columns_to_handle_outliers = ['Profession', 'City', 'Sleep Duration', 'Dietary Habits', 'Degree']
+    df = handle_categorical_outliers(df, columns=columns_to_handle_outliers, threshold=20)
+
+    save_data(df, 'cleaned', 'test')
