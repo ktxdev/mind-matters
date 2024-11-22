@@ -145,3 +145,36 @@ def handle_outliers(data: pd.DataFrame, threshold: int = 20) -> pd.DataFrame:
         # Replace infrequent categories with 'Other'
         data[col] = data[col].apply(lambda category: 'Other' if category in infrequent_categories else category)
     return data
+
+
+def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
+    # Create copy of data
+    df = df.copy()
+    # Drop unwanted features
+    df = df.drop(columns=['id', 'Name'])
+    # Convert data types
+    df = convert_data_types(df)
+    # handle missing values
+    df = handle_missing_values(df)
+    # handle outliers
+    df = handle_outliers(df)
+    return df
+
+if __name__ == '__main__':
+    import os
+    import sys
+
+    # Add the parent directory of src to the Python path
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+    from utils.data import load_data, save_data
+
+    data_dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data'))
+    file_path = os.path.join(data_dir_path, 'raw/train.csv')
+    # load the data
+    data = load_data(file_path)
+    # Preprocess data
+    data = preprocess_data(data)
+    # save data
+    save_path = os.path.join(data_dir_path, 'processed/train.csv')
+    save_data(data, save_path)

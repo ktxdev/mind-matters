@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Union, Callable, Tuple, Dict, Any
 
 import matplotlib.pyplot as plt
@@ -53,27 +54,34 @@ class DataVisualizer:
                     axes: Tuple[plt.Axes, plt.Axes],
                     batch_size: int,
                     plot_func: Callable,
-                    plot_func_args: Dict[str, Any] = {}) -> None:
+                    plot_func_args=None) -> None:
         """
         Helper function to plot batched data.
         """
+        if plot_func_args is None:
+            plot_func_args = {}
         batch_data = self._batch_data(self.data, unique_values, column, batch_size, i)
         ax = axes[0] if i % 2 == 0 else axes[1]
         plot_func(data=batch_data, x=column, ax=ax, **plot_func_args)
         self._plot_and_customize(ax, f"{title} - Batch {i + 1}", column, "Count", rotation=90)
 
-    def _plot_batched(self, column: str, plot_func: Callable, batch_size: int = DEFAULT_BATCH_SIZE) -> None:
+    def _plot_batched(self, column: str, plot_func: Callable, batch_size: int = DEFAULT_BATCH_SIZE,
+                      plot_func_args=None) -> None:
         """
         Generalized function for plotting batched data.
         """
+        if plot_func_args is None:
+            plot_func_args = {}
+
         unique_values = self.data[column].unique()
         num_batches = int(np.ceil(len(unique_values) / batch_size))
 
         for i in range(0, num_batches, 2):
             fig, axes = plt.subplots(1, 2, figsize=(18, 6))
-            self._plot_batch(unique_values, column, f'Count Plot for {column}', i, axes, batch_size, plot_func)
+            self._plot_batch(unique_values, column, f'Count Plot for {column}', i, axes, batch_size, plot_func, plot_func_args)
             if i + 1 < num_batches:  # Handle odd batch cases
-                self._plot_batch(unique_values, column, f'Count Plot for {column}', i + 1, axes, batch_size, plot_func)
+                self._plot_batch(unique_values, column, f'Count Plot for {column}', i + 1, axes, batch_size, plot_func,
+                                 plot_func_args)
             plt.tight_layout()
             plt.show()
 
@@ -105,31 +113,8 @@ class DataVisualizer:
         plt.tight_layout()
         plt.show()
 
-    def plot(self, column_name: str) -> None:
-        """
-        Plots a histogram and bar plot for numerical columns and a count plot for categorical columns.
-
-        Parameters:
-            column_name (str): The column name to base the plot on.
-        """
-        # Check if column exists
-        if column_name not in self.data.columns:
-            print(f"Column '{column_name}' does not exist in the DataFrame.")
-            return
-
-        # Get the data type of the column
-        dtype = self.data[column_name].dtype
-
-        # Plot based on data type
-        if pd.api.types.is_numeric_dtype(dtype):
-            self._plot_numerical(column_name)
-        elif isinstance(dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(dtype):
-            self._plot_categorical(column_name)
-        else:
-            print(f"The column '{column_name}' has a data type not suitable for plotting.")
-
-    def plot_numerical_vs_categorical(self, numeric_col: str, categorical_col: str,
-                                      batch_size: int = DEFAULT_BATCH_SIZE) -> None:
+    def _plot_numerical_vs_categorical(self, numeric_col: str, categorical_col: str,
+                                       batch_size: int = DEFAULT_BATCH_SIZE) -> None:
         """
         Plot a boxplot of a numerical column against a categorical column.
         """
@@ -141,9 +126,10 @@ class DataVisualizer:
             sns.boxplot(data=self.data, x=categorical_col, y=numeric_col)
             plt.title(f"{numeric_col} vs. {categorical_col}")
             plt.xticks(rotation=90)
+            plt.grid(axis='y', linestyle='--', alpha=0.7)
             plt.show()
 
-    def plot_numerical_vs_numerical(self, numeric_col1: str, numeric_col2: str) -> None:
+    def _plot_numerical_vs_numerical(self, numeric_col1: str, numeric_col2: str) -> None:
         """
         Plot a scatter plot for two numerical columns.
         """
@@ -155,8 +141,8 @@ class DataVisualizer:
         plt.grid(True, linestyle="--", alpha=0.7)
         plt.show()
 
-    def plot_categorical_vs_categorical(self, categorical_col1: str, categorical_col2: str,
-                                        batch_size: int = DEFAULT_BATCH_SIZE) -> None:
+    def _plot_categorical_vs_categorical(self, categorical_col1: str, categorical_col2: str,
+                                         batch_size: int = DEFAULT_BATCH_SIZE) -> None:
         """
         Plot a count plot for two categorical columns with batching if necessary.
         """
@@ -169,4 +155,42 @@ class DataVisualizer:
             sns.countplot(data=self.data, x=categorical_col1, hue=categorical_col2)
             plt.title(f"{categorical_col1} vs. {categorical_col2}")
             plt.xticks(rotation=90)
+            plt.grid(axis='y', linestyle='--', alpha=0.7)
             plt.show()
+
+    def _check_column_exists(self, column: str) -> bool:
+        if column not in self.data.columns:
+            print(f"Column '{column}' does not exist in the DataFrame.")
+            return False
+
+        return True
+
+    def plot(self, column_name1: str, column_name2: str = None) -> None:
+        # Check if column exists
+        self._check_column_exists(column_name1)
+
+        # Get the data type of the column
+        col1_dtype = self.data[column_name1].dtype
+
+        # Plot based on data type
+        if column_name2 and self._check_column_exists(column_name2):
+            col2_dtype = self.data[column_name2].dtype
+
+            if pd.api.types.is_numeric_dtype(col1_dtype) and pd.api.types.is_numeric_dtype(col2_dtype):
+                self._plot_numerical_vs_numerical(column_name1, column_name2)
+            elif pd.api.types.is_numeric_dtype(col1_dtype) and (
+                    isinstance(col2_dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(col2_dtype)):
+                self._plot_numerical_vs_categorical(column_name1, column_name2)
+            elif pd.api.types.is_numeric_dtype(col2_dtype) and (
+                    isinstance(col1_dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(col1_dtype)):
+                self._plot_numerical_vs_categorical(column_name2, column_name1)
+            elif (isinstance(col1_dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(col1_dtype)) and (
+                    isinstance(col2_dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(col2_dtype)):
+                self._plot_categorical_vs_categorical(column_name1, column_name2)
+        else:
+            if pd.api.types.is_numeric_dtype(col1_dtype):
+                self._plot_numerical(column_name1)
+            elif isinstance(col1_dtype, pd.CategoricalDtype) or pd.api.types.is_object_dtype(col1_dtype):
+                self._plot_categorical(column_name1)
+            else:
+                print(f"The column '{column_name1}' has a data type not suitable for plotting.")
