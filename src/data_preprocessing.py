@@ -2,6 +2,8 @@ import pandas as pd
 
 from enum import Enum
 from typing import List
+
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.impute import SimpleImputer
 
 
@@ -76,9 +78,8 @@ def convert_data_types(data: pd.DataFrame) -> pd.DataFrame:
     # Copy dataframe
     data = data.copy()
     columns_to_convert = ['Academic Pressure', 'Work Pressure', 'Study Satisfaction',
-                          'Job Satisfaction', 'Work/Study Hours', 'Financial Stress',
-                          'Depression']
-    data[columns_to_convert] = data[columns_to_convert].astype('object')
+                          'Job Satisfaction', 'Work/Study Hours', 'Financial Stress']
+    data[columns_to_convert] = data[columns_to_convert].astype(str)
     return data
 
 
