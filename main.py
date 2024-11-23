@@ -1,6 +1,6 @@
 import argparse
 
-from src.pipeline.train import train_and_evaluate
+from src.pipeline.train import train_and_evaluate, evaluate_model
 
 
 def main():
@@ -15,6 +15,8 @@ def main():
 
     if args.train:
         train_and_evaluate(args.train)
+    elif args.evaluate:
+        evaluate_model(args.evaluate)
     else:
         print("Error: Unsupported command. Use --train or --evaluate.")
 

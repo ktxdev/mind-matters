@@ -14,6 +14,7 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
         for col in self.columns:
             temp_df = pd.DataFrame({col: X[col], 'Depression': y})
             self.encoding_maps[col] = temp_df.groupby(col)['Depression'].mean()
+
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
