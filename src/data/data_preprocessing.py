@@ -1,10 +1,12 @@
-import pandas as pd
-
 from enum import Enum
 from typing import List
 
-from sklearn.base import BaseEstimator, TransformerMixin
+import pandas as pd
 from sklearn.impute import SimpleImputer
+
+from utils.logger import get_logger
+
+logger = get_logger('Data Preprocessing')
 
 
 class NumericImputationStrategy(Enum):
@@ -75,15 +77,18 @@ def _handle_categorical_missing_values(data: pd.DataFrame,
 
 
 def convert_data_types(data: pd.DataFrame) -> pd.DataFrame:
+    logger.info("Converting data types")
     # Copy dataframe
     data = data.copy()
     columns_to_convert = ['Academic Pressure', 'Work Pressure', 'Study Satisfaction',
                           'Job Satisfaction', 'Work/Study Hours', 'Financial Stress']
     data[columns_to_convert] = data[columns_to_convert].astype(str)
+    logger.info("Converting data types successful")
     return data
 
 
 def handle_missing_values(data: pd.DataFrame) -> pd.DataFrame:
+    logger.info("Handling missing values")
     # Copy dataframe
     data = data.copy()
     # Group data into students and working professional
@@ -94,9 +99,9 @@ def handle_missing_values(data: pd.DataFrame) -> pd.DataFrame:
                                                    ['CGPA'],
                                                    strategy=NumericImputationStrategy.MEDIAN)
     working_professionals_data = _handle_numeric_missing_values(working_professionals_data,
-                                                   ['CGPA'],
-                                                   strategy=NumericImputationStrategy.NOT_APPLICABLE,
-                                                   fill_value=-1)
+                                                                ['CGPA'],
+                                                                strategy=NumericImputationStrategy.NOT_APPLICABLE,
+                                                                fill_value=-1)
     # handle missing values for Academic Pressure and Study Satisfaction
     working_professionals_data = _handle_categorical_missing_values(working_professionals_data,
                                                                     ['Academic Pressure', 'Study Satisfaction'],
@@ -128,15 +133,19 @@ def handle_missing_values(data: pd.DataFrame) -> pd.DataFrame:
     data.update(working_professionals_data)
     # handle missing values for Financial Stress, Dietary Habits and Degree
     data = _handle_categorical_missing_values(data,
-                                              ['Financial Stress', 'Dietary Habits', 'Degree'],
+                                              # ['Financial Stress', 'Dietary Habits', 'Degree'],
+                                              ['Financial Stress', 'Dietary Habits'],
                                               CategoricalImputationStrategy.MODE)
+    logger.info("Handling missing values successful!")
     return data
 
 
 def handle_outliers(data: pd.DataFrame, threshold: int = 20) -> pd.DataFrame:
+    logger.info("Handling outliers...")
     # Copy the dataframe
     data = data.copy()
-    columns_to_handle_outliers = ['Profession', 'City', 'Sleep Duration', 'Dietary Habits', 'Degree']
+    # columns_to_handle_outliers = ['Profession', 'City', 'Sleep Duration', 'Dietary Habits', 'Degree']
+    columns_to_handle_outliers = ['Profession', 'City', 'Sleep Duration', 'Dietary Habits']
     # Categories with fewer than this count will be replaced
     for col in columns_to_handle_outliers:
         # Get the frequency of each category
@@ -145,21 +154,25 @@ def handle_outliers(data: pd.DataFrame, threshold: int = 20) -> pd.DataFrame:
         infrequent_categories = freq[freq < threshold].index
         # Replace infrequent categories with 'Other'
         data[col] = data[col].apply(lambda category: 'Other' if category in infrequent_categories else category)
+    logger.info("Handling outliers successful!")
     return data
 
 
 def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
+    logger.info("Preprocessing data...")
     # Create copy of data
     df = df.copy()
     # Drop unwanted features
-    df = df.drop(columns=['id', 'Name'])
+    df = df.drop(columns=['id', 'Name', 'Gender', 'Degree'], errors='ignore')
     # Convert data types
     df = convert_data_types(df)
     # handle missing values
     df = handle_missing_values(df)
     # handle outliers
     df = handle_outliers(df)
+    logger.info("Data preprocessing successful!")
     return df
+
 
 if __name__ == '__main__':
     import os

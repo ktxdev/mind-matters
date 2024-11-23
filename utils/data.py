@@ -1,10 +1,16 @@
 import os
+from typing import Tuple
+
 import pandas as pd
 
 
-def load_data(data_file_path: str) -> pd.DataFrame:
+def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Loads data into a pandas dataframe"""
-    return pd.read_csv(data_file_path)
+    data_dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', 'data'))
+    file_path = os.path.join(data_dir_path, 'raw/train.csv')
+    data = pd.read_csv(file_path)
+    target = 'Depression'
+    return data.drop(columns=[target]), data[target]
 
 
 def save_data(df: pd.DataFrame, save_path: str) -> None:
