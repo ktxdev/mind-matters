@@ -1,7 +1,7 @@
 from typing import List
 
 from src.transformers.custom_transformers import ScaleNumericFeatures, GenerateInteractionFeatures
-from src.transformers.encorders import EncodeCategoricalFeatures
+from src.transformers.encoders import EncodeCategoricalFeatures
 from src.transformers.preprocessors import DataPreprocessor
 
 

@@ -70,9 +70,9 @@ def _handle_categorical_missing_values(data: pd.DataFrame,
     if strategy.value == "mode":
         for column in columns:
             mode_value = data[column].mode()[0]
-            data[column] = data[column].fillna(mode_value).astype('object')
+            data[column] = data[column].astype(str).replace('nan', mode_value).astype('object')
     elif strategy.value == "new_category" and category_name is not None:
-        data[columns] = data[columns].fillna(category_name).astype('object')
+        data[columns] = data[columns].astype(str).replace('nan', category_name).astype('object')
     return data
 
 
@@ -172,23 +172,3 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     df = handle_outliers(df)
     logger.info("Data preprocessing successful!")
     return df
-
-
-if __name__ == '__main__':
-    import os
-    import sys
-
-    # Add the parent directory of src to the Python path
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-    from utils.data import load_data, save_data
-
-    data_dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data'))
-    file_path = os.path.join(data_dir_path, 'raw/train.csv')
-    # load the data
-    data = load_data(file_path)
-    # Preprocess data
-    data = preprocess_data(data)
-    # save data
-    save_path = os.path.join(data_dir_path, 'processed/train.csv')
-    save_data(data, save_path)
