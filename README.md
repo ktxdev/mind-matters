@@ -115,13 +115,13 @@ python main.py --train xgb
 ## Technologies Used
 
 <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
-<img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python" style="width: 120px; height: 60px; object-fit: contain;"/>
-<img src="https://pandas.pydata.org/static/img/pandas_white.svg" alt="Pandas" style="width: 120px; height: 60px; object-fit: contain;"/> 
-<img src="https://numpy.org/images/logo.svg" alt="NumPy" style="width: 120px; height: 60px; object-fit: contain;"/> 
-<img src="https://scikit-learn.org/stable/_static/scikit-learn-logo-small.png" alt="Scikit-learn" style="width: 120px; height: 60px; object-fit: contain;"/> 
-<img src="https://jupyter.org/assets/homepage/main-logo.svg" alt="Jupyter" style="width: 120px; height: 60px; object-fit: contain;"/> 
-<img src="https://matplotlib.org/_static/logo_light.svg" alt="Matplotlib" style="width: 120px; height: 60px; object-fit: contain;"/> 
-<img src="https://seaborn.pydata.org/_static/logo-wide-lightbg.svg" alt="Seaborn" style="width: 120px; height: 60px; object-fit: contain;"/> 
+<img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python" style="width: auto; height: 60px; object-fit: contain;"/>
+<img src="https://pandas.pydata.org/static/img/pandas_white.svg" alt="Pandas" style="width: auto; height: 60px; object-fit: contain;"/> 
+<img src="https://numpy.org/images/logo.svg" alt="NumPy" style="width: auto; height: 60px; object-fit: contain;"/> 
+<img src="https://scikit-learn.org/stable/_static/scikit-learn-logo-small.png" alt="Scikit-learn" style="width: auto; height: 60px; object-fit: contain;"/> 
+<img src="https://jupyter.org/assets/homepage/main-logo.svg" alt="Jupyter" style="width: auto; height: 60px; object-fit: contain;"/> 
+<img src="https://matplotlib.org/_static/logo_light.svg" alt="Matplotlib" style="width: auto; height: 60px; object-fit: contain;"/> 
+<img src="https://seaborn.pydata.org/_static/logo-wide-lightbg.svg" alt="Seaborn" style="width: auto; height: 60px; object-fit: contain;"/> 
 </div>
 
 ## Acknowledgements 
