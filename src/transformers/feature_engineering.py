@@ -54,8 +54,8 @@ class InteractionFeatureEngineer(BaseEstimator, TransformerMixin):
                 "mask": student_mask,
             },
             {
-                "col1": self._handle_remainder_column_name('Work Pressure'),
-                "col2": self._handle_remainder_column_name('Financial Stress'),
+                "col1": self._handle_label_encoded_column_name('Work Pressure'),
+                "col2": self._handle_label_encoded_column_name('Financial Stress'),
                 "new_col": "Work Pressure x Financial Stress",
             },
             # Profession × Job Satisfaction

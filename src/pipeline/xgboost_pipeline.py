@@ -1,5 +1,4 @@
-from sklearn.model_selection import GridSearchCV, StratifiedKFold
-from sklearn.pipeline import Pipeline
+from imblearn.pipeline import Pipeline
 from xgboost import XGBClassifier
 
 from src.pipeline.base_pipeline import get_base_pipeline_steps
@@ -16,6 +15,8 @@ def build_xgb_pipeline():
     pipeline = Pipeline(base_pipeline_steps)
 
     xgb_param_grid = {
+        # 'oversampling__sampling_strategy': ['auto', 0.5, 0.8],
+        # 'oversampling__k_neighbors': [3, 5, 7],
         'xgb__n_estimators': [100, 200, 300],
         'xgb__max_depth': [3, 5, 7],
         'xgb__learning_rate': [0.01, 0.1, 0.2, 0.3],

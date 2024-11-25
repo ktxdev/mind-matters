@@ -119,7 +119,7 @@ def handle_missing_values(data: pd.DataFrame) -> pd.DataFrame:
     working_professionals_data = _handle_categorical_missing_values(working_professionals_data,
                                                                     ['Work Pressure', 'Job Satisfaction'],
                                                                     CategoricalImputationStrategy.MODE)
-    # handle missing values for Profession
+    # handle missing values for Profession and Degree
     working_professionals_data = _handle_categorical_missing_values(working_professionals_data,
                                                                     ['Profession'],
                                                                     CategoricalImputationStrategy.NEW_CATEGORY,
@@ -133,8 +133,7 @@ def handle_missing_values(data: pd.DataFrame) -> pd.DataFrame:
     data.update(working_professionals_data)
     # handle missing values for Financial Stress, Dietary Habits and Degree
     data = _handle_categorical_missing_values(data,
-                                              # ['Financial Stress', 'Dietary Habits', 'Degree'],
-                                              ['Financial Stress', 'Dietary Habits'],
+                                              ['Financial Stress', 'Dietary Habits', 'Degree'],
                                               CategoricalImputationStrategy.MODE)
     logger.info("Handling missing values successful!")
     return data
@@ -144,8 +143,7 @@ def handle_outliers(data: pd.DataFrame, threshold: int = 20) -> pd.DataFrame:
     logger.info("Handling outliers...")
     # Copy the dataframe
     data = data.copy()
-    # columns_to_handle_outliers = ['Profession', 'City', 'Sleep Duration', 'Dietary Habits', 'Degree']
-    columns_to_handle_outliers = ['Profession', 'City', 'Sleep Duration', 'Dietary Habits']
+    columns_to_handle_outliers = ['Profession', 'City', 'Sleep Duration', 'Dietary Habits', 'Degree']
     # Categories with fewer than this count will be replaced
     for col in columns_to_handle_outliers:
         # Get the frequency of each category
@@ -163,7 +161,7 @@ def preprocess_data(df: pd.DataFrame) -> pd.DataFrame:
     # Create copy of data
     df = df.copy()
     # Drop unwanted features
-    df = df.drop(columns=['id', 'Name', 'Gender', 'Degree'], errors='ignore')
+    df = df.drop(columns=['id', 'Name'], errors='ignore')
     # Convert data types
     df = convert_data_types(df)
     # handle missing values

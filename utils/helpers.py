@@ -7,6 +7,7 @@ from utils.logger import get_logger
 
 logger = get_logger("Utilities")
 
+
 def check_and_print_missing_value_counts(data: pd.DataFrame, column_name: str) -> None:
     """Counts and displays missing value counts for given column_name"""
     missing_values_rows = data[column_name].isnull()
@@ -40,16 +41,15 @@ def save_model(pipeline, model_name, compress=1):
 
 
 def load_latest_model(model_name):
-    """
-    Loads the latest version of a model based on its naming convention.
+    # Sort by version number in descending order
+    latest_model_file = get_latest_model_file(model_name)
 
-    Args:
-        directory (str): The directory where the model files are stored.
-        model_name (str): The base name of the model (e.g., 'xgb', 'logistic_regression').
+    # Load the latest model
+    logger.info(f"Loading latest model: {latest_model_file}")
+    return load_model(latest_model_file), latest_model_file
 
-    Returns:
-        The loaded model or None if no matching model is found.
-    """
+
+def get_latest_model_file(model_name):
     models_dir_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models'))
     # Compile a regex pattern to match model files with versioning
     pattern = re.compile(rf"{model_name}_v(\d+)\.joblib")
@@ -67,7 +67,4 @@ def load_latest_model(model_name):
 
     # Sort by version number in descending order
     latest_model_file = sorted(model_files, key=lambda x: x[1], reverse=True)[0][0]
-
-    # Load the latest model
-    logger.info(f"Loading latest model: {latest_model_file}")
-    return load_model(latest_model_file)
+    return latest_model_file

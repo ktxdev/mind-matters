@@ -49,7 +49,13 @@ class LabelEncoderTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         X = X.copy()
+
         for col in self.columns:
+            unseen_mask = ~X[col].isin(self.label_encoders[col].classes_)
+
+            if unseen_mask.any():
+                X.loc[unseen_mask, col] = '0'
+
             X[col] = self.label_encoders[col].transform(X[col].astype(str))
         return X
 
