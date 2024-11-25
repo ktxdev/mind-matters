@@ -114,7 +114,7 @@ python main.py --train xgb
 
 ## Technologies Used
 
-<div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
+<div style="display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
 <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" alt="Python" style="width: auto; height: 60px; object-fit: scale-down;"/>
 <img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Pandas_mark.svg" alt="Pandas" style="width: auto; height: 60px; object-fit: scale-down;"/> 
 <img src="https://numpy.org/images/logo.svg" alt="NumPy" style="width: auto; height: 60px; object-fit: scale-down;"/> 
